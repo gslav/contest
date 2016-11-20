@@ -4,22 +4,28 @@ import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
  * Created by gSlav on 19.11.2016 22:36.
  */
 
-class AirLines {
+class AirLines implements Comparable<AirLines>{
     private String city;
     private int number;
     private String type;
 
+    public AirLines(){
 
+    }
 
     public AirLines(String[] line) {
+        this.set(line);
+    }
+
+    public void set(String[] line) {
         String city = line[0];
         int number = Integer.parseInt(line[1]);
         String type = line[2];
@@ -51,6 +57,11 @@ class AirLines {
     public void setType(String type) {
         this.type = type;
     }
+
+    @Override
+    public int compareTo(AirLines o) {
+        return this.number - o.getNumber();
+    }
 }
 
 public class Task3 {
@@ -71,11 +82,19 @@ public class Task3 {
         }
         printDataToConsole(myAirLines);
 
+        /*
         if (!search(myAirLines, 635))
-            System.out.println("Не найдено");
+            System.out.println("Рейс не найден");
         if (!search(myAirLines, 636))
-            System.out.println("Не найдено");
-        printToFile(myAirLines,
+            System.out.println("Рейс не найден");
+        */
+
+        List<AirLines> myAirLines2 = myAirLines;
+        Collections.sort(myAirLines2);
+
+        System.out.println();
+        printDataToConsole(myAirLines2);
+        printToFile(myAirLines2,
                 "resourses//airlines2.db");
     }
 
