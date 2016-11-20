@@ -17,6 +17,17 @@ class AirLines {
     private int number;
     private String type;
 
+
+
+    public AirLines(String[] line) {
+        String city = line[0];
+        int number = Integer.parseInt(line[1]);
+        String type = line[2];
+        this.setCity(city);
+        this.setNumber(number);
+        this.setType(type);
+    }
+
     public String getCity() {
         return city;
     }
@@ -40,15 +51,6 @@ class AirLines {
     public void setType(String type) {
         this.type = type;
     }
-
-    public AirLines(String[] line) {
-        String city = line[0];
-        int number = Integer.parseInt(line[1]);
-        String type = line[2];
-        this.setCity(city);
-        this.setNumber(number);
-        this.setType(type);
-    }
 }
 
 public class Task3 {
@@ -67,9 +69,49 @@ public class Task3 {
         catch (IOException e) {
             System.err.println(e.getMessage());
         }
-
         printDataToConsole(myAirLines);
 
+        if (!search(myAirLines, 635))
+            System.out.println("Не найдено");
+        if (!search(myAirLines, 636))
+            System.out.println("Не найдено");
+        printToFile(myAirLines,
+                "resourses//airlines2.db");
+    }
+
+    public static void printToFile(List<AirLines> myAirLines, String myPath) {
+        File myFile = new File(
+                String.valueOf(OpenCreateFile(myPath)));
+        if (!myFile.canWrite())
+            myFile.setWritable(true);
+
+        PrintWriter out = null;
+        try {
+            out = new PrintWriter(
+                    myFile.getAbsoluteFile());
+        } catch (FileNotFoundException e) {
+            System.err.println(e.getMessage());
+        }
+        for (AirLines tmp : myAirLines) {
+            out.println(tmp.getNumber() + "::" + tmp.getCity() + "::" + tmp.getType());
+        }
+        out.close();
+    }
+
+    public static boolean search(List<AirLines> myAirLines, int number) {
+        for (AirLines myAirLine: myAirLines) {
+            if (number == myAirLine.getNumber()) {
+                printDataToConsole(myAirLine);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static void printDataToConsole(AirLines myAirLine) {
+        System.out.println(myAirLine.getNumber() + " + " +
+                myAirLine.getCity() + " + " +
+                myAirLine.getType());
     }
 
     public static void printDataToConsole(List<AirLines> myAirLines) {
@@ -91,6 +133,7 @@ public class Task3 {
             if (!myFile.exists())
                 myFile.createNewFile();
 
+            /*
             if (myFile.length() == 0) {
                 String[] temp = {
                         "Москва::635::1",
@@ -106,6 +149,7 @@ public class Task3 {
                 }
                 out.close();
             }
+            */
         }
         catch(IOException e){
             System.out.println(e.getMessage());
