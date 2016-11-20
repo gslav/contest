@@ -7,14 +7,18 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Scanner;
 
 /**
  * Created by gSlav on 19.11.2016 22:36.
  */
 
 class AirLines implements Comparable<AirLines>{
+    /** место прибытия */
     private String city;
+    /** номер рейса */
     private int number;
+    /** тип самолета */
     private String type;
 
     public AirLines(){
@@ -58,6 +62,12 @@ class AirLines implements Comparable<AirLines>{
         this.type = type;
     }
 
+    /**
+     * Компаратор (сравнитель) экземпляров класса.
+     * Сравнение происходит по полю number (номер рейса)
+     * @param o - экземпляр класс AirLines
+     * @return -1 (если < ), 0 (если == ), 1 (если > )
+     */
     @Override
     public int compareTo(AirLines o) {
         return this.number - o.getNumber();
@@ -66,12 +76,15 @@ class AirLines implements Comparable<AirLines>{
 
 public class Task3 {
     public static void main(String[] args) {
+        Scanner in = new Scanner(System.in);
         List<AirLines> myAirLines = new ArrayList<>();
         Path myDir = OpenCreateFile("resourses//airlines.db").toPath();
 
+        /**
+         * чтение из файла
+         */
         try {
             List<String> myData = Files.readAllLines(myDir, Charset.defaultCharset());
-
             for (String line:myData) {
                 AirLines a = new AirLines(line.trim().split("::"));
                 myAirLines.add(a);
@@ -81,21 +94,32 @@ public class Task3 {
             System.err.println(e.getMessage());
         }
         printDataToConsole(myAirLines);
-
-        /*
-        if (!search(myAirLines, 635))
-            System.out.println("Рейс не найден");
-        if (!search(myAirLines, 636))
-            System.out.println("Рейс не найден");
-        */
-
-        List<AirLines> myAirLines2 = myAirLines;
-        Collections.sort(myAirLines2);
-
-        System.out.println();
-        printDataToConsole(myAirLines2);
-        printToFile(myAirLines2,
-                "resourses//airlines2.db");
+        int key;
+        do {
+            System.out.println("Введите" +
+                    "\n\t1 для поиска по номеру рейса" +
+                    "\n\t2 для сортировки по номеру рейса" +
+                    "\n\t3 для записи в файл" +
+                    "\n\t0 для выхода");
+            key = in.nextInt();
+            switch (key) {
+                case 1:
+                    System.out.println("Введите номер искомого рейса ");
+                    search(myAirLines, in.nextInt());
+                    break;
+                case 2:
+                    Collections.sort(myAirLines);
+                    printDataToConsole(myAirLines);
+                    System.out.println();
+                    break;
+                case 3:
+                    printToFile(myAirLines,
+                            "resourses//airlines2.db");
+                    break;
+                case 0:
+                    System.exit(0);
+            }
+        }while (true);
     }
 
     public static void printToFile(List<AirLines> myAirLines, String myPath) {
@@ -111,10 +135,13 @@ public class Task3 {
         } catch (FileNotFoundException e) {
             System.err.println(e.getMessage());
         }
+
         for (AirLines tmp : myAirLines) {
             out.println(tmp.getNumber() + "::" + tmp.getCity() + "::" + tmp.getType());
         }
         out.close();
+        System.out.println("Данные успешно записаны \n" +
+                myFile.getPath());
     }
 
     public static boolean search(List<AirLines> myAirLines, int number) {
@@ -124,23 +151,28 @@ public class Task3 {
                 return true;
             }
         }
+        System.out.print("Рейс номер " + number + " не найден.");
         return false;
     }
 
     public static void printDataToConsole(AirLines myAirLine) {
-        System.out.println(myAirLine.getNumber() + " + " +
-                myAirLine.getCity() + " + " +
+        System.out.println(
+                "Рейс № " + myAirLine.getNumber() +
+                "\tприбытие в: " +
+                myAirLine.getCity() +
+                "\t тип: " +
                 myAirLine.getType());
     }
 
     public static void printDataToConsole(List<AirLines> myAirLines) {
-        for (AirLines line:myAirLines) {
-            System.out.println(line.getNumber() + " + " +
-                    line.getCity() + " + " +
-                    line.getType());
-        }
+        myAirLines.forEach(Task3::printDataToConsole);
     }
 
+    /**
+     * Открыть файл, если файл существует, иначе создать новый.
+     * @param myPath - путь к каталогу с базой рейсов самолетов (от каталога запуска программы)
+     * @return открытый файл
+     */
     private static File OpenCreateFile(String myPath){
         String[] str = myPath.trim().split("//");
         File myDir = new File(System.getProperty("user.dir") + "//" + str[0]);
@@ -151,24 +183,6 @@ public class Task3 {
 
             if (!myFile.exists())
                 myFile.createNewFile();
-
-            /*
-            if (myFile.length() == 0) {
-                String[] temp = {
-                        "Москва::635::1",
-                        "Самара::21::3",
-                        "Минск::344::2"};
-
-                if (!myFile.canWrite())
-                    myFile.setWritable(true);
-
-                PrintWriter out = new PrintWriter(myFile.getAbsoluteFile());
-                for (String tmp : temp) {
-                    out.println(tmp);
-                }
-                out.close();
-            }
-            */
         }
         catch(IOException e){
             System.out.println(e.getMessage());
